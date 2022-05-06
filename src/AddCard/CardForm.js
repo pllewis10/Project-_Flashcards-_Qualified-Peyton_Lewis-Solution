@@ -1,49 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams  } from 'react-router-dom'
-import { createCard, updateCard } from "../utils/api";
 
-function CardForm({ frontInput, backInput, cardType }) {
+function CardForm({ card, handleSubmit, setCard }) {
   const { deckId, cardId} = useParams();
-  const initialCardState = {
-    front: frontInput,
-    back: backInput,
-    id: cardId,
-    deckId: deckId
-  };
-  const [cardData, setCardData] = useState({ ...initialCardState });
 
   useEffect(() => {
-    setCardData({
-      front: frontInput,
-      back: backInput,
+    setCard({
+      front: card.front,
+      back: card.back,
       id: cardId,
       deckId: deckId
     });
-  }, [frontInput, backInput, cardId, deckId]);
+  }, [card.front, card.back, cardId, deckId]);
 
   const handleChange = ({ target }) => {
-    setCardData({
-      ...cardData,
+    setCard({
+      ...card,
       [target.name]: target.value,
     });
   };
 
-  const history = useHistory();
+  
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (cardType === 'add') {
-      await createCard(deckId, cardData)
-      setCardData({ ...initialCardState })
-      history.go(0)
-    } else if (cardType === 'edit') {
-      console.log(cardData)
-        await updateCard(cardData)
-        setCardData({ ...initialCardState })
-        history.push(`/decks/${deckId}`)
-    }
-  }
-
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -54,7 +33,7 @@ function CardForm({ frontInput, backInput, cardType }) {
             id='front'
             name='front'
             onChange={handleChange}
-            value={cardData.front}
+            value={card.front}
             rows='5'
             required
             />
@@ -67,7 +46,7 @@ function CardForm({ frontInput, backInput, cardType }) {
             id='back'
             name='back'
             onChange={handleChange}
-            value={cardData.back}
+            value={card.back}
             rows='5'
             required
             />

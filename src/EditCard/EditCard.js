@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { readDeck, readCard } from "../utils/api";
-import CardForm from "../AddCard/CardForm";
+import { readDeck, readCard, updateCard } from "../utils/api";
+import { CardForm } from "../AddCard/CardForm";
 import { Link, useParams, useHistory } from 'react-router-dom'
 
 function EditCard () {
   const [deckInfo, setDeckInfo] = useState([]);
-  const [cardInfo, setCardInfo] = useState([]);
+  const [cardData, setCardData] = useState([]);
   const params = useParams();
   const history = useHistory();
 
+  
   useEffect(() => {
     const getDeck = async () => {
       const response = await readDeck(params.deckId);
@@ -20,7 +21,7 @@ function EditCard () {
   useEffect(() => {
     const getCard = async () => {
       const response = await readCard(params.cardId);
-      setCardInfo(response);
+      setCardData(response);
     }
     getCard();
   }, [params])
@@ -28,6 +29,15 @@ function EditCard () {
   const handleCancel = (event) => {
     event.preventDefault();
     history.push(`/decks/${params.deckId}`)
+  }
+
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+      console.log(cardData)
+        await updateCard(cardData)
+        //setCardData({ ...cardInfo })
+        history.push(`/decks/${params.deckId}`)
   }
 
   return (
@@ -45,9 +55,9 @@ function EditCard () {
       </nav>
       <h1>Edit Card</h1>
       <CardForm 
-        frontInput={cardInfo.front}
-        backInput={cardInfo.back}
-        cardType={'edit'}
+        setCard={setCardData}
+        card={cardData}
+        handleSubmit={handleSubmit}
       />
       <button type="button" className='btn btn-secondary' onClick={handleCancel}>Cancel</button>
     </div>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from 'react-router-dom'
-import { readDeck } from "../utils/api";
-import CardForm from "./CardForm";
+import { useParams, Link, useHistory } from 'react-router-dom'
+import { readDeck, createCard} from "../utils/api";
+import { CardForm } from "./CardForm";
 
 function AddCard() {
   const [deckInfo, setDeckInfo] = useState([]);
   const { deckId } = useParams();
+  const initialCardState = { card: {front: '', back: ''} };
+  const [cardData, setCardData] = useState({ ...initialCardState });
 
   useEffect(() => {
     const controller = new AbortController()
@@ -24,7 +26,16 @@ function AddCard() {
       controller.abort()
     }
   }, [deckId])
-  
+
+  const history = useHistory();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+      await createCard(deckId, cardData)
+      //setCardData({ ...initialCardState })
+      history.go(0)
+  }
+
   return (
     <div>
       <nav aria-label="breadcrumb">
@@ -39,7 +50,7 @@ function AddCard() {
         </ol>
       </nav>
       <h1><span>{deckInfo.name}</span>: <span>Add Card</span></h1>
-      <CardForm frontInput={''} backInput={''} cardType={'add'} />
+      <CardForm handleSubmit={handleSubmit} card={cardData} setCard={setCardData}/>
       <br />
       <Link to={`/decks/${deckId}`}>
         <button type="button" className="btn btn-secondary">Done</button>
